@@ -71,7 +71,14 @@ $("buy").onclick = async () => {
     const d = await rpc("create_order", { p_plan_id: PLAN_ID });
     if (!d.link) throw new Error(JSON.stringify(d));
     localStorage.setItem("order_id", d.order_id);
-    window.location.href = d.link;   // رفتن به پرداخت بله
+    let link = String(d.link).trim();
+    if (!/^[a-z][a-z0-9+.-]*:\/\//i.test(link)) {
+      link = link.startsWith("//") ? "https:" + link : "https://" + link.replace(/^\/+/, "");
+    }
+    const a = document.createElement("a");
+    a.href = link; a.textContent = "اگر منتقل نشدی اینجا بزن"; a.style.color = "var(--accent)";
+    $("msg").textContent = ""; $("msg").appendChild(a);
+    window.location.href = link;   // رفتن به پرداخت بله
   } catch (e) {
     $("msg").textContent = "خطا: " + e.message; $("buy").disabled = false;
   }
